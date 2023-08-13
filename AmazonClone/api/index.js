@@ -1,14 +1,31 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+const express = require("express");
+const bodyParser = require("body-parser");
+const mongoose = require('mongoose'); // Fixed typo here
+const crypto = require("crypto");
+const nodemailer = require("nodemailer");
 
-const index = () => {
-  return (
-    <View>
-      <Text>index</Text>
-    </View>
-  )
-}
+const app = express();
+const port = 8000;
+const cors = require("cors");
+app.use(cors());
 
-export default index
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
-const styles = StyleSheet.create({})
+const jwt = require("jsonwebtoken");
+
+mongoose
+  .connect("mongodb+srv://Siddu:Siddu0335@cluster0.p8dzw8x.mongodb.net/your-database-name", {
+    useNewUrlParser: true, // Fixed typo here
+    useUnifiedTopology: true,
+  })
+  .then(() => {
+    console.log("Connected to MongoDB");
+  })
+  .catch((err) => {
+    console.log("Error connecting to MongoDB:", err);
+  });
+
+app.listen(port, () => {
+  console.log("Server is running on port", port);
+});

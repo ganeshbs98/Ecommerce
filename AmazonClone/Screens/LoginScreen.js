@@ -12,7 +12,7 @@ import {
 import { MaterialCommunityIcons, Entypo, AntDesign } from "@expo/vector-icons";
 import React, { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import AsyncStorage, { useAsyncStorage } from "@react-native-async-storage/async-storage";
 import axios from "axios";
 
 const LoginScreen = () => {
@@ -23,8 +23,8 @@ const LoginScreen = () => {
 
   const handlerlogin = () => {
     const user = {
-      Email: email,
-      Password: Pwd,
+      email: email,
+      password: Pwd,
     };
     axios
       .post("http://192.168.0.105:8000/login", user)
@@ -32,7 +32,7 @@ const LoginScreen = () => {
         console.log(response);
         const token = response.data.token;
         AsyncStorage.setItem("authtoken", token);
-        navigation.replace("Home");
+        navigation.replace("Main");
       })
       .catch((error) => {
         Alert.alert("Login Error", "Invalid Email");

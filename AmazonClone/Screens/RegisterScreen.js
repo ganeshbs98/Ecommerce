@@ -6,7 +6,8 @@ import {
   KeyboardAvoidingView,
   Image,
   Pressable,
-  TextInput
+  TextInput,
+  Alert,
 } from "react-native";
 import {
   MaterialCommunityIcons,
@@ -16,6 +17,7 @@ import {
 } from "@expo/vector-icons";
 import React, { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
+import axios from "axios";
 
 const RegisterScreen = () => {
   const [email, setEmail] = useState("");
@@ -23,6 +25,47 @@ const RegisterScreen = () => {
   const [username, setUsername] = useState("");
   const [shwPwd, setShwPwd] = useState(false);
   const navigation = useNavigation();
+
+  const handleRegister = () => {
+    const user = {
+      name: username,
+      email: email,
+      password: Pwd,
+    };
+    //send a post request to the backend API
+    axios
+      .post("http://192.168.0.105:8000/register", user)
+      .then((response) => {
+        console.log(response);
+        Alert.alert(
+          "Registration succesfull",
+          "You have registered successfully"
+        );
+        setUsername(""), setEmail(""), setPwd("");
+      })
+      .catch((error) => {
+        console.log("registeration failed", error.response);
+        Alert.alert(
+          "Registration Error",
+          "An error ouccured during registration"
+        );
+        if (error.response) {
+          console.log("Response Data:", error.response.data);
+          console.log("Response Status:", error.response.status);
+        } else if (error.request) {
+          console.log("No Response Received:", error.request);
+        } else {
+          console.log("Error Message:", error.message); // Log the error message
+        }
+
+        console.log("Request Config:", error.config);
+
+        Alert.alert(
+          "Registration Error",
+          "An error occurred during registration"
+        );
+      });
+  };
   return (
     <SafeAreaView
       style={{
@@ -70,13 +113,13 @@ const RegisterScreen = () => {
                 width: 220,
                 marginLeft: 10,
                 fontSize: username ? 16 : 16,
-              }}  
+              }}
               placeholder="enter your name"
             />
           </View>
         </View>
 
-        <View style={{marginTop:20}}>
+        <View style={{ marginTop: 20 }}>
           <View
             style={{
               flexDirection: "row",
@@ -165,6 +208,7 @@ const RegisterScreen = () => {
         </View>
         <View style={{ marginTop: 70 }} />
         <Pressable
+          onPress={handleRegister}
           style={{
             width: 150,
             backgroundColor: "#FEBE10",
@@ -211,6 +255,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   loginContainer: {
-    marginTop:50,
+    marginTop: 50,
   },
 });

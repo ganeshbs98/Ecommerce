@@ -36,8 +36,6 @@ const ProductInfoScreen = () => {
       setAddedToCart(false);
     }, 60000);
   };
-
-  console.log(route.params)
   return (
     <ScrollView
       showsVerticalScrollIndicator={false}

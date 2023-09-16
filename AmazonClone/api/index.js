@@ -26,8 +26,8 @@ mongoose
     console.log("Error connecting to MongoDB:", err);
   });
 
-app.listen(port, "192.168.0.105", () => {
-  console.log("Server is running on http://192.168.0.105");
+app.listen(port, "192.168.0.106", () => {
+  console.log("Server is running on http://192.168.0.106");
 });
 const User = require("./models/user");
 const Order = require("./models/order");
@@ -51,7 +51,7 @@ const sendVerificationEmail = async (email, verificationToken) => {
     from: "amazon.com",
     to: email,
     subject: "Email Verification",
-    text: `Please click the following link to verify your email: http://192.168.0.105:8000/verify/${verificationToken}`,
+    text: `Please click the following link to verify your email: http://192.168.0.106:8000/verify/${verificationToken}`,
   };
   //send the email
   try {
@@ -124,7 +124,7 @@ app.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    //if thebuser already exists
+    //if the user already exists
     const user = await User.findOne({ email });
     //if user doesn't exist
     if (!user) {
@@ -141,3 +141,11 @@ app.post("/login", async (req, res) => {
     res.status(500).json({ message: "Login failed" });
   }
 });
+
+
+//end point to store a new address to the 
+app.post("/address", async(req,res)=>{
+try{}catch(error){
+res.status(500).json({message:"error adding the address"})
+}
+})

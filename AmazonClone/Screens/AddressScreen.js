@@ -6,15 +6,34 @@ import {
   TextInput,
   View,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import jwt_decode from "jwt-decode";
+import { UserType } from "../UserContext";
 
 const AddressScreen = () => {
-    const[name,setName]=useState("")
-    const[mobileNo,setMobileNo]=useState("")
-    const[houseNo,setHouseNo]=useState("")
-    const[street,setStreet]=useState("")
-    const[landmark,setLandmark]=useState("")
-    const[pincode,setPincode]=useState("x")
+  const [name, setName] = useState("");
+  const [mobileNo, setMobileNo] = useState("");
+  const [houseNo, setHouseNo] = useState("");
+  const [street, setStreet] = useState("");
+  const [landmark, setLandmark] = useState("");
+  const [pincode, setPincode] = useState("");
+  const{userId,setUserId}=useContext(UserType)
+  useEffect(() => {
+    const fetchUser = async () => {
+      const token = await AsyncStorage.getItem("authtoken");
+      console.log(token+"jbafskjbfsakjAB")
+      const decodedToken = jwt_decode(token);
+      const userId = decodedToken.userId;
+      setUserId(userId);
+       // Log userId after it has been set
+    };
+    fetchUser();
+  }, []);
+  console.log(userId);
+  const handleAddress = () => {
+
+  };
   return (
     <ScrollView style={{ marginTop: 50 }}>
       <View style={{ height: 50, backgroundColor: "#00CED1" }} />
@@ -23,7 +42,6 @@ const AddressScreen = () => {
           Add a new Address
         </Text>
         <TextInput
-        
           placeholderTextColor={"black"}
           placeholder="India"
           style={{
@@ -39,8 +57,8 @@ const AddressScreen = () => {
             Full name (First and Last name)
           </Text>
           <TextInput
-          value={name}
-          onChangeText={(text)=>setName(text)}
+            value={name}
+            onChangeText={(text) => setName(text)}
             placeholderTextColor={"black"}
             placeholder="enter your name"
             style={{
@@ -57,8 +75,8 @@ const AddressScreen = () => {
             Mobile Number
           </Text>
           <TextInput
-          value={mobileNo}
-          onChangeText={(text)=>setMobileNo(text)}
+            value={mobileNo}
+            onChangeText={(text) => setMobileNo(text)}
             placeholderTextColor={"black"}
             placeholder="enter your mobile number"
             style={{
@@ -75,8 +93,8 @@ const AddressScreen = () => {
             Flat,House No,Building,Company
           </Text>
           <TextInput
-          value={houseNo}
-          onChangeText={(text)=>setHouseNo(text)}
+            value={houseNo}
+            onChangeText={(text) => setHouseNo(text)}
             placeholderTextColor={"black"}
             placeholder=""
             style={{
@@ -93,8 +111,8 @@ const AddressScreen = () => {
             Area,Street,sector,Village
           </Text>
           <TextInput
-          value={street}
-          onChangeText={(text)=>setStreet(text)}
+            value={street}
+            onChangeText={(text) => setStreet(text)}
             placeholderTextColor={"black"}
             placeholder=""
             style={{
@@ -109,8 +127,8 @@ const AddressScreen = () => {
         <View style={{ marginVertical: 6 }}>
           <Text style={{ fontWeight: "bold", fontSize: 15 }}>Landmark</Text>
           <TextInput
-          value={landmark}
-          onChangeText={(text)=>setLandmark(text)}
+            value={landmark}
+            onChangeText={(text) => setLandmark(text)}
             placeholderTextColor={"black"}
             placeholder="Eg near handpost"
             style={{
@@ -125,8 +143,8 @@ const AddressScreen = () => {
         <View style={{ marginVertical: 6 }}>
           <Text style={{ fontWeight: "bold", fontSize: 15 }}>Pincode</Text>
           <TextInput
-          value={pincode}
-          onChangeText={(text)=>setPincode(text)}
+            value={pincode}
+            onChangeText={(text) => setPincode(text)}
             placeholderTextColor={"black"}
             placeholder="Enter Pincode"
             style={{
@@ -139,16 +157,17 @@ const AddressScreen = () => {
           />
         </View>
         <Pressable
+          onPress={handleAddress}
           style={{
             backgroundColor: "#FFC72C",
             padding: 17,
             borderRadius: 6,
             justifyContent: "center",
             alignItems: "center",
-            marginVertical:20
+            marginVertical: 20,
           }}
         >
-          <Text style={{fontWeight:'bold'}}>Add address</Text>
+          <Text style={{ fontWeight: "bold" }}>Add address</Text>
         </Pressable>
       </View>
     </ScrollView>

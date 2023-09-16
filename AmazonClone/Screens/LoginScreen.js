@@ -10,7 +10,7 @@ import {
   Alert,
 } from "react-native";
 import { MaterialCommunityIcons, Entypo, AntDesign } from "@expo/vector-icons";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage, { useAsyncStorage } from "@react-native-async-storage/async-storage";
 import axios from "axios";
@@ -21,13 +21,27 @@ const LoginScreen = () => {
   const [shwPwd, setShwPwd] = useState(false);
   const navigation = useNavigation();
 
+  useEffect(()=>{
+    const ChkLoginStatus=async()=>{
+      try{
+        const token=await AsyncStorage.getItem("authtoken");
+        if(token){
+          navigation.replace("Main")
+        }
+      }catch(error){
+        console.log("error message",error)
+      }
+    }
+    ChkLoginStatus();
+  },[])
+
   const handlerlogin = () => {
     const user = {
       email: email,
       password: Pwd,
     };
     axios
-      .post("http://192.168.0.105:8000/login", user)
+      .post("http://192.168.0.106:8000/login", user)
       .then((response) => {
         console.log(response);
         const token = response.data.token;

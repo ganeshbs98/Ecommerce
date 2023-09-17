@@ -141,11 +141,37 @@ app.post("/login", async (req, res) => {
     res.status(500).json({ message: "Login failed" });
   }
 });
+//end point to store a new address to the
+app.post("/addresses", async (req, res) => {
+  try {
+    const { userId, address } = req.body;
+    //find the user by userid
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User Not Found" });
+    }
+    user.addresses.push(address);
+    await user.save();
+    res.status(200).json({ message: "Address created successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "error adding the address" });
+  }
+});
 
+//endpoint to get all the address to a partocular user
 
-//end point to store a new address to the 
-app.post("/address", async(req,res)=>{
-try{}catch(error){
-res.status(500).json({message:"error adding the address"})
-}
-})
+app.get("/addresses/:userId", async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    console.log("add");
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "User is Not Found" });
+    }
+    const addresses = user.addresses;
+    res.status(200).json({ addresses });
+  } catch (error) {
+    res.status(500).json({ message: "Error retireveing the Address" });
+  }
+});

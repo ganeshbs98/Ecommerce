@@ -9,12 +9,18 @@ import {
   TextInput,
   View,
 } from "react-native";
-import React, { useCallback, useEffect, useState } from "react";
-import { EvilIcons, Feather, MaterialIcons,Entypo,Ionicons } from "@expo/vector-icons";
+import React, { useCallback, useContext, useEffect, useState } from "react";
+import {
+  EvilIcons,
+  Feather,
+  MaterialIcons,
+  Entypo,
+  Ionicons,
+} from "@expo/vector-icons";
 import { SliderBox } from "react-native-image-slider-box";
 import axios from "axios";
 import ProductItem from "../Component/ProductItem";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import DropDownPicker from "react-native-dropdown-picker";
 import { useSelector } from "react-redux";
 import {
@@ -23,6 +29,9 @@ import {
   ModalPortal,
   SlideAnimation,
 } from "react-native-modals";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import jwt_decode from "jwt-decode";
+import { UserType } from "../UserContext";
 
 const HomeScreen = () => {
   const list = [
@@ -198,6 +207,11 @@ const HomeScreen = () => {
   const [Products, setProducts] = useState([]);
   const [open, setOpen] = useState(false);
   const [category, setCategory] = useState("jewelery");
+  const [addresses, setAddresses] = useState([]);
+  const [selectedAddress, setSelectedAddress] = useState("");
+  console.log(selectedAddress);
+  const { userId, setUserId } = useContext(UserType);
+
   const [items, setItems] = useState([
     { label: "Men's clothing", value: "men's clothing" },
     { label: "jewelery", value: "jewelery" },
@@ -224,6 +238,40 @@ const HomeScreen = () => {
 
   const cart = useSelector((state) => state.cart.cart);
   const [modalVisible, setModalVisible] = useState(false);
+  useEffect(() => {
+    if (userId) {
+      fetchAddress();
+    }
+  }, []);
+  const fetchAddress = async () => {
+    try {
+      const response = await axios.get(
+        `http://192.168.0.106:8000/addresses/${userId}`
+      );
+      const { addresses } = response.data;
+      setAddresses(addresses);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  // console.log(addresses);
+  useEffect(() => {
+    const fetchAddress = async () => {
+      const token = await AsyncStorage.getItem("authtoken");
+      const decodedToken = jwt_decode(token);
+      const userId = decodedToken.userId;
+      setUserId(userId);
+    };
+    fetchAddress();
+  }, [userId, modalVisible]);
+  console.log(addresses);
+  useEffect(() => {
+    // When addresses are fetched, check if there is a selected address
+    // If not, set the first address in the list as selectedAddress
+    if (!selectedAddress && addresses.length > 0) {
+      setSelectedAddress(addresses[0]);
+    }
+  }, [addresses]);
   return (
     <>
       <SafeAreaView
@@ -276,9 +324,15 @@ const HomeScreen = () => {
           >
             <EvilIcons name="location" size={24} color="black" />
             <Pressable>
-              <Text style={{ fontSize: 13, fontWeight: "500" }}>
-                Deliver to Ganesh- Boppnahalli 571114{" "}
-              </Text>
+              {selectedAddress ? (
+                <Text style={{ fontSize: 13, fontWeight: "500" }}>
+                  Deliver to {selectedAddress?.name}-{selectedAddress?.street}
+                </Text>
+              ) : (
+                <Text style={{ fontSize: 13, fontWeight: "500" }}>
+                  Add a Address
+                </Text>
+              )}
             </Pressable>
 
             <MaterialIcons name="keyboard-arrow-down" size={26} color="black" />
@@ -490,9 +544,61 @@ const HomeScreen = () => {
             </Text>
           </View>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            {/*a;ready added address */}
+            {addresses.map((item, index) => (
+              <Pressable
+                onPress={() => {
+                  setSelectedAddress(item);
+                  setModalVisible(false);
+                }}
+                style={{
+                  width: 140,
+                  height: 140,
+                  borderColor: "#D0D0D0",
+                  padding: 10,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  borderWidth: 1,
+                  gap: 3,
+                  marginRight: 15,
+                  marginTop: 10,
+                  backgroundColor:
+                    selectedAddress === item ? "#FBCEB1" : "white",
+                }}
+              >
+                <View
+                  key={index}
+                  style={{ flexDirection: "row", alignItems: "center", gap: 3 }}
+                >
+                  <Text style={{ fontSize: 13, fontWeight: "bold" }}>
+                    {item?.name}
+                  </Text>
+                  <Entypo name="location-pin" size={24} color="red" />
+                </View>
+                <Text
+                  numberOfLines={1}
+                  style={{ width: 130, fontSize: 13, textAlign: "center" }}
+                >
+                  {item?.houseNo},{item?.landmark}
+                </Text>
+                <Text
+                  numberOfLines={1}
+                  style={{ width: 130, fontSize: 13, textAlign: "center" }}
+                >
+                  {item?.street}
+                </Text>
+                <Text
+                  numberOfLines={1}
+                  style={{ width: 130, fontSize: 13, textAlign: "center" }}
+                >
+                  India,Mysuru
+                </Text>
+              </Pressable>
+            ))}
             <Pressable
-            onPress={()=>{ setModalVisible(!modalVisible),navigation.navigate("AddAddress")}}
+              onPress={() => {
+                setModalVisible(!modalVisible),
+                  navigation.navigate("AddAddress");
+              }}
               style={{
                 width: 140,
                 height: 140,
@@ -515,23 +621,31 @@ const HomeScreen = () => {
               </Text>
             </Pressable>
           </ScrollView>
-          <View style={{flexDirection:'column',gap:7,marginBottom:13}}>
-            <View style={{flexDirection:'row',alignItems:'center',gap:5}}>
-            <Entypo name="location-pin" size={22} color="#0066b2" />
-            <Text style={{color:"#0066b2",fontWeight:'400'}}>Enter the Indian pincode</Text>
+          <View style={{ flexDirection: "column", gap: 7, marginBottom: 13 }}>
+            <View
+              style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
+            >
+              <Entypo name="location-pin" size={22} color="#0066b2" />
+              <Text style={{ color: "#0066b2", fontWeight: "400" }}>
+                Enter the Indian pincode
+              </Text>
             </View>
-            <View style={{flexDirection:'row',alignItems:'center',gap:5}}>
-            <Ionicons name="locate-sharp" size={22} color="#0066b2" />
-            <Text style={{color:"#0066b2",fontWeight:'400'}}>Use My current location</Text>
+            <View
+              style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
+            >
+              <Ionicons name="locate-sharp" size={22} color="#0066b2" />
+              <Text style={{ color: "#0066b2", fontWeight: "400" }}>
+                Use My current location
+              </Text>
             </View>
-            <View style={{flexDirection:'row',alignItems:'center',gap:5}}>
-            <Ionicons name="earth-outline" size={22} color="#0066b2" />
-            <Text style={{color:"#0066b2",fontWeight:'400'}}>Deliver outside India</Text>
+            <View
+              style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
+            >
+              <Ionicons name="earth-outline" size={22} color="#0066b2" />
+              <Text style={{ color: "#0066b2", fontWeight: "400" }}>
+                Deliver outside India
+              </Text>
             </View>
-            
-            
-          
-
           </View>
         </ModalContent>
       </BottomModal>

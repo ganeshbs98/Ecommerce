@@ -13,6 +13,9 @@ import { Entypo, AntDesign, Ionicons } from "@expo/vector-icons";
 import ProductInfoScreen from "./Screens/ProductInfoScreen";
 import AddAddressScreen from "./Screens/AddAddressScreen";
 import AddressScreen from "./Screens/AddressScreen";
+import CartScreen from "./Screens/CartScreen";
+import ProfileScreen from "./Screens/ProfileScreen";
+import ConfirmationScreen from "./Screens/ConfirmationScreen";
 
 const StackNavigatore = () => {
   const Stack = createNativeStackNavigator();
@@ -37,7 +40,7 @@ const StackNavigatore = () => {
         />
         <Tab.Screen
           name="Profile"
-          component={HomeScreen}
+          component={ProfileScreen}
           options={{
             tabBarLabel: "Profile",
             tabBarStyle: { color: "#008E97" },
@@ -52,7 +55,7 @@ const StackNavigatore = () => {
         />
         <Tab.Screen
           name="Cart"
-          component={HomeScreen}
+          component={CartScreen}
           options={{
             tabBarLabel: "Cart",
             tabBarStyle: { color: "#008E97" },
@@ -73,11 +76,6 @@ const StackNavigatore = () => {
     <NavigationContainer>
       <Stack.Navigator>
         <Stack.Screen
-          name="Main"
-          component={BottomTabs}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
           name="Login"
           component={LoginScreen}
           options={{ headerShown: false }}
@@ -85,6 +83,11 @@ const StackNavigatore = () => {
         <Stack.Screen
           name="Register"
           component={RegisterScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Main"
+          component={BottomTabs}
           options={{ headerShown: false }}
         />
         <Stack.Screen
@@ -100,6 +103,11 @@ const StackNavigatore = () => {
         <Stack.Screen
           name="Address"
           component={AddressScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Confirm"
+          component={ConfirmationScreen}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

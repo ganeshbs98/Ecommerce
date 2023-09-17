@@ -22,13 +22,13 @@ const userSchema = new mongoose.Schema({
   addresses: [
     {
       name: String,
-      mobileno: String,
+      mobileNo: String,
       houseNo: String,
       street: String,
       landmark: String,
       city: String,
       country: String,
-      postalCode: String,
+      pincode: String,
     },
   ],
   orders: [
@@ -43,5 +43,5 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-const User=mongoose.model("User",userSchema);
-module.exports=User
+const User = mongoose.model("User", userSchema);
+module.exports = User;

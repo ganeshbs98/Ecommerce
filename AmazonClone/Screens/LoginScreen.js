@@ -24,7 +24,9 @@ const LoginScreen = () => {
   useEffect(()=>{
     const ChkLoginStatus=async()=>{
       try{
+        console.log("token");
         const token=await AsyncStorage.getItem("authtoken");
+        console.log("token-"+token);
         if(token){
           navigation.replace("Main")
         }

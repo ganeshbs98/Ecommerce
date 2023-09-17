@@ -1,7 +1,8 @@
 import {
+  Alert,
   Pressable,
   ScrollView,
-  StyleSheet,
+  StyleSheet, 
   Text,
   TextInput,
   View,
@@ -10,6 +11,8 @@ import React, { useContext, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import jwt_decode from "jwt-decode";
 import { UserType } from "../UserContext";
+import { useNavigation } from "@react-navigation/native";
+import axios from "axios";
 
 const AddressScreen = () => {
   const [name, setName] = useState("");
@@ -18,21 +21,48 @@ const AddressScreen = () => {
   const [street, setStreet] = useState("");
   const [landmark, setLandmark] = useState("");
   const [pincode, setPincode] = useState("");
-  const{userId,setUserId}=useContext(UserType)
+  const { userId, setUserId } = useContext(UserType);
+  const navigation = useNavigation();
   useEffect(() => {
-    const fetchUser = async () => {
+    const fetchAddress = async () => {
       const token = await AsyncStorage.getItem("authtoken");
-      console.log(token+"jbafskjbfsakjAB")
       const decodedToken = jwt_decode(token);
       const userId = decodedToken.userId;
       setUserId(userId);
-       // Log userId after it has been set
     };
-    fetchUser();
+    fetchAddress();
   }, []);
   console.log(userId);
-  const handleAddress = () => {
+  const isButtonEnabled =
+    name && mobileNo && houseNo && street && landmark && pincode;
 
+  const handleAddress = () => {
+    const address = {
+      name,
+      mobileNo,
+      houseNo,
+      street,
+      landmark,
+      pincode,
+    };
+    axios
+      .post("http://192.168.0.106:8000/addresses", { userId, address })
+      .then((response) => {
+        Alert.alert("Success", "Addresses added successfully");
+        setName("");
+        setMobileNo("");
+        setHouseNo("");
+        setStreet("");
+        setLandmark("");
+        setPincode("");
+        setTimeout(() => {
+          navigation.goBack();
+        }, 500);
+      })
+      .catch((error) => {
+        Alert.alert("Error", "Failed to Add Address");
+        console.log("Error", error);
+      });
   };
   return (
     <ScrollView style={{ marginTop: 50 }}>
@@ -157,7 +187,12 @@ const AddressScreen = () => {
           />
         </View>
         <Pressable
-          onPress={handleAddress}
+          onPress={() => {
+            if (isButtonEnabled) {
+              handleAddress();
+            }
+          }}
+          disabled={!isButtonEnabled}
           style={{
             backgroundColor: "#FFC72C",
             padding: 17,
